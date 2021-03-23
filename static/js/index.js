@@ -26,7 +26,10 @@ const initializeVideo = () => {
         root.appendChild(canvas)
         
         const animation = (async function render() {
-            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
+            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
+                inputSize: 128,
+                scoreThreshold: 0.4
+            })).withFaceLandmarks().withFaceExpressions()
             const resized = faceapi.resizeResults(detections, resolution)
             context.clearRect(0, 0, canvas.width, canvas.height)
             faceapi.draw.drawDetections(canvas, resized)
