@@ -14,7 +14,7 @@ def index():
 
 @io.on("detections")
 def handle_detections(data):
-    print(data)
-
+    print("received data")
+    
 if __name__ == "__main__":
     io.run(app, host="127.0.0.1", port=8080, debug=True)
