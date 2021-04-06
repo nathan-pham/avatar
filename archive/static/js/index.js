@@ -2,8 +2,8 @@ const socket = io()
 const root = document.getElementById("root")
 const modelPath = "/static/js/face-api/models"
 const resolution = {
-    width: 720,
-    height: 560
+    width: 640,
+    height: 360
 }
 
 const applyAttributes = (element, options) => (
@@ -23,21 +23,25 @@ const initializeVideo = () => {
     video.addEventListener("play", () => {
         const canvas = faceapi.createCanvasFromMedia(video)
         const context = canvas.getContext("2d")
-        applyAttributes(canvas, resolution)
         root.appendChild(canvas)
+        
+        applyAttributes(canvas, resolution)
         
         const animation = (async function render() {
             const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
-                inputSize: 128,
-                scoreThreshold: 0.4
+                inputSize: 160,
+                scoreThreshold: 0.45
             })).withFaceLandmarks().withFaceExpressions()
-            const resized = faceapi.resizeResults(detections, resolution)
+
+            const resized = detections
+            // faceapi.resizeResults(detections, resolution)
+            
             context.clearRect(0, 0, canvas.width, canvas.height)
-            faceapi.draw.drawDetections(canvas, resized)
             faceapi.draw.drawFaceLandmarks(canvas, resized)
+            faceapi.draw.drawDetections(canvas, resized)
             faceapi.draw.drawFaceExpressions(canvas, resized)
 
-            // socket.emit("detections", detections)
+            socket.emit("detections", detections)
 
             return requestAnimationFrame(render)
         })()
