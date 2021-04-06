@@ -1,10 +1,3 @@
-const root = document.getElementById("root")
-const modelPath = "/static/js/face-api/models"
-const resolution = {
-    width: 640,
-    height: 360
-}
-
 const applyAttributes = (element, options) => (
     Object.keys(resolution).forEach(prop => element.setAttribute(prop, options[prop]))
 )
@@ -20,11 +13,11 @@ const initializeVideo = () => {
     )
 
     video.addEventListener("play", () => {
-        const canvas = faceapi.createCanvasFromMedia(video)
-        const context = canvas.getContext("2d")
-        root.appendChild(canvas)
+        // const canvas = faceapi.createCanvasFromMedia(video)
+        // const context = canvas.getContext("2d")
+        // root.appendChild(canvas)
         
-        applyAttributes(canvas, resolution)
+        // applyAttributes(canvas, resolution)
         
         const animation = (async function render() {
             const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
@@ -32,19 +25,39 @@ const initializeVideo = () => {
                 scoreThreshold: 0.45
             })).withFaceLandmarks().withFaceExpressions()
 
-            const resized = detections
-            // faceapi.resizeResults(detections, resolution)
+            // const results = faceapi.resizeResults(detections, resolution)
             
-            context.clearRect(0, 0, canvas.width, canvas.height)
-            faceapi.draw.drawFaceLandmarks(canvas, resized)
-            faceapi.draw.drawDetections(canvas, resized)
-            faceapi.draw.drawFaceExpressions(canvas, resized)
+            // context.clearRect(0, 0, canvas.width, canvas.height)
+            // faceapi.draw.drawFaceLandmarks(canvas, resized)
+            // faceapi.draw.drawDetections(canvas, resized)
+            // faceapi.draw.drawFaceExpressions(canvas, resized)
+
+            if(renderer) {
+                updateCube(detections[0])
+                renderer.render(scene, camera)
+            }
 
             return requestAnimationFrame(render)
         })()
     })
 
     return video
+}
+
+const updateCube = (results) => {
+    const box = results?.detection?._box
+
+    if(!box) {
+        return
+    }
+    
+    const xPos = (box.left + box.width / 2)
+    const xPercent = xPos / 640
+
+    const yPos = (box.top + box.height / 2)
+    const yPercent = yPos / 360
+
+    TweenMax.to(cube.position, 0.2, {x: (xPercent - 0.5) * 10, y: (yPercent - 0.5) * -10, ease: Linear.easeNone});
 }
 
 Promise.all([
