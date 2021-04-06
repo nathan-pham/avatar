@@ -1,4 +1,3 @@
-const socket = io()
 const root = document.getElementById("root")
 const modelPath = "/static/js/face-api/models"
 const resolution = {
@@ -40,8 +39,6 @@ const initializeVideo = () => {
             faceapi.draw.drawFaceLandmarks(canvas, resized)
             faceapi.draw.drawDetections(canvas, resized)
             faceapi.draw.drawFaceExpressions(canvas, resized)
-
-            socket.emit("detections", detections)
 
             return requestAnimationFrame(render)
         })()
