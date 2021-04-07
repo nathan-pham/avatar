@@ -4,12 +4,12 @@ import { ROOT, RESOLUTION } from "./constants.js"
 
 class World {
     scene = new THREE.Scene()
-    camera = new THREE.PerspectiveCamera(75, RESOLUTION.height / RESOLUTION.width, 0.1, 1000)
+    camera = new THREE.PerspectiveCamera(75, RESOLUTION.width / RESOLUTION.height, 0.1, 1000)
     renderer = new THREE.WebGLRenderer()
     
     constructor() {
-        this.scene.background = new THREE.Color(0xdddddd)
-        this.renderer.setSize(RESOLUTION.height, RESOLUTION.width)
+        this.scene.background = new THREE.Color(0xadd8e6)
+        this.renderer.setSize(RESOLUTION.width, RESOLUTION.height)
         this.camera.position.z = 5
 
         ROOT.appendChild(this.renderer.domElement)
@@ -24,10 +24,16 @@ class World {
     }
 }
 
-export const createAmbientLight = () => new THREE.AmbientLight(0x404040, 100)
-export const createDirectionalLight = () => {
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 50)
-    directionalLight.position.set(0,1,0)
+export const createAmbientLight = () => new THREE.AmbientLight(0xadd8e6, 100)
+export const createDirectionalLight = (intensity, position) => {
+    const directionalLight = new THREE.DirectionalLight(0xffffff, intensity)
+    directionalLight.position.set(...position)
+    directionalLight.castShadow = false
+    return directionalLight
+}
+export const createPointLight = (intensity, position) => {
+    const directionalLight = new THREE.DirectionalLight(0xffffff, intensity)
+    directionalLight.position.set(...position)
     directionalLight.castShadow = false
     return directionalLight
 }

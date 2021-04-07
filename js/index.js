@@ -1,11 +1,11 @@
 import { ROOT, FACE_API_MODEL_PATH, RIG_MODEL_PATH, RESOLUTION, X_ROTATIONAL_SCALE } from "./constants.js"
 import { applyAttributes, allowNegativeIndex, distance, map } from "./utils.js"
-import World, { createAmbientLight, createDirectionalLight, loadModel } from "./world.js"
+import World, { createAmbientLight, createDirectionalLight, createPointLight, loadModel } from "./world.js"
 
 const world = new World()
 world.add(createAmbientLight())
-world.add(createDirectionalLight())
-
+world.add(createDirectionalLight(5, [1, -15, 0]))
+world.add(createPointLight(10, [0, 300, 500]))
 
 const loadFaceAPI = (modelPath) => {
     Promise.all([
@@ -39,17 +39,18 @@ const startFaceAPI = (object) => {
     })
 }
 
-const changePosition = (box) => {
+const changePosition = (box, z=0) => {
     const xPos = (box.left + box.width / 2)
     const xPercent = xPos / RESOLUTION.width
     
     const yPos = (box.top + box.height / 2)
     const yPercent = yPos / RESOLUTION.height
 
-    return {
-        x: (xPercent - 0.5) * -10, 
-        y: (yPercent - 0.5) * -10
-    }
+    return [
+        (xPercent - 0.5) * -10, 
+        (yPercent - 0.5) * -10,
+        z
+    ]
 }
 
 const formatPoints = (data) => {
@@ -70,16 +71,15 @@ const positionObject = (object, results) => {
     const box = detection._box
     const points = formatPoints(results.landmarks._positions)
 
-    const newLocation = changePosition(box)
-    Object.assign(object.position, newLocation)
+    // Object.assign(object.position, newLocation)
 
-    const chin = points.slice(0, 17)
     const lEyebrow = allowNegativeIndex(points.slice(17, 22))
     const rEyebrow = allowNegativeIndex(points.slice(22, 27))
     const nose = points.slice(27, 36)
     const lEye = points.slice(36, 42)
     const rEye = points.slice(42, 48)
-    const mouth = points.slice(48) 
+    // const chin = points.slice(0, 17)
+    // const mouth = points.slice(48) 
 
     const eyeDistance = distance(rEye[2][0], rEye[2][1], lEye[1][0], lEye[1][1])
     const rotationalZ = Math.atan2(rEye[2][1] - lEye[1][1], rEye[2][0] - lEye[1][0])
@@ -92,19 +92,10 @@ const positionObject = (object, results) => {
     const noseLength = nose[6][1] - nose[3][1]
     const rotationalX = Math.radians(Math.degrees((-Math.atan2(noseLength / eyeDistance, 0.05) + Math.radians(66))) * X_ROTATIONAL_SCALE) + Math.abs(rotationalY) 
     
+    object.rotation.set(rotationalX - 1, rotationalY, rotationalZ)
 
-    Object.assign(object.rotation, {
-        x: rotationalX - 1,
-        y: rotationalY,
-        z: rotationalZ
-    })
-
-    // const scaleFactor = Math.abs(map(noseLength + eyeDistance, [90, 400], [1, 5]))
-    // Object.assign(object.scale, {
-    //     x: scaleFactor,
-    //     y: scaleFactor,
-    //     z: scaleFactor
-    // })
+    const newLocation = changePosition(box, map(noseLength + eyeDistance, [80, 350], [0, 5]))
+    object.position.set(...newLocation)
 }
 
 const initialize = async () => {
