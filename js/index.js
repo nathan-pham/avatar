@@ -46,10 +46,10 @@ const initializeVideo = () => {
 
 const changePosition = (box) => {
     const xPos = (box.left + box.width / 2)
-    const xPercent = xPos / 640
+    const xPercent = xPos / resolution.width
     
     const yPos = (box.top + box.height / 2)
-    const yPercent = yPos / 360
+    const yPercent = yPos / resolution.height
 
     return {
         x: (xPercent - 0.5) * 10, 
@@ -111,9 +111,6 @@ const updateCube = (results) => {
     const rotationalY = Math.radians(eyebrowImplications * 90) * 0.85
 
     const noseLength = nose[6][1] - nose[3][1]
-    // const py = 
-
-    // sum(pos_histories[1]) / len(pos_histories[1])
     const rotationalX = Math.radians(Math.degrees((-Math.atan2(noseLength / eyeDistance, 0.05) + Math.radians(66))) * X_ROTATIONAL_SCALE) + Math.abs(rotationalY) 
     
     Object.assign(cube.rotation, {
@@ -128,15 +125,6 @@ const updateCube = (results) => {
         y: scaleFactor,
         z: scaleFactor
     })
-
-    // cube.scale
-    // * py
-
-    /*
-
-    rot_x = math.radians(math.degrees((-math.atan2(nose_length / eye_dis, 0.05) + math.radians(66))) * X_ROT_SCALE) + abs(rot_y) * py
-    main_font.render('rotx: ' + str(round(math.degrees(rot_x), 2)), screen, (4, 270))
-    */
 }
 
 Promise.all([
