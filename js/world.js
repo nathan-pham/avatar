@@ -101,6 +101,4 @@ export const loadSky = async (modelPath) => {
 	// 			const refractionCube = new THREE.CubeTextureLoader().load( urls );
 	// 			refractionCube.mapping = THREE.CubeRefractionMapping;
 
-}
-
 export default World
