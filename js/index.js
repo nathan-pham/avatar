@@ -1,3 +1,5 @@
+import * as Three from "https://cdnjs.cloudflare.com/ajax/libs/three.js/r127/three.module.min.js"
+
 const applyAttributes = (element, options) => (
     Object.keys(resolution).forEach(prop => element.setAttribute(prop, options[prop]))
 )
