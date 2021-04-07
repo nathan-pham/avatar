@@ -58,6 +58,7 @@ const changePosition = (box) => {
 }
 
 const distance = (x1, y1, x2, y2) => Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+const map = (input, [in_min, in_max], [out_min, out_max]) => (input - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 const formatPoints = (data) => {
     const points = []
@@ -120,6 +121,15 @@ const updateCube = (results) => {
         y: rotationalY,
         z: rotationalZ
     })
+
+    const scaleFactor = map(noseLength, [10, 60], [1, 5])
+    Object.assign(cube.scale, {
+        x: scaleFactor,
+        y: scaleFactor,
+        z: scaleFactor
+    })
+
+    // cube.scale
     // * py
 
     /*
