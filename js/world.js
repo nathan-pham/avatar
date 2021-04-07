@@ -8,7 +8,7 @@ class World {
     renderer = new THREE.WebGLRenderer()
     
     constructor() {
-        // this.scene.background = new THREE.Color(ENVIRONMENT_COLOR)
+        this.scene.background = new THREE.Color(ENVIRONMENT_COLOR)
         this.renderer.setSize(RESOLUTION.width, RESOLUTION.height)
         this.camera.position.z = 7
 
@@ -32,7 +32,7 @@ class World {
     }
 }
 
-export const createAmbientLight = () => new THREE.AmbientLight(0xffffff, 100)
+export const createAmbientLight = () => new THREE.AmbientLight(0xffffff)
 export const createDirectionalLight = (intensity, position) => {
     const directionalLight = new THREE.DirectionalLight(ENVIRONMENT_COLOR, intensity)
     directionalLight.position.set(...position)
@@ -60,21 +60,46 @@ export const loadModel = (modelPath) => {
     })
 }
 
+// export const loadSky = async (modelPath) => {
+//     const geometry = new THREE.SphereGeometry( 500, 60, 40 )
+// 	geometry.scale( - 1, 1, 1 )
+
+//     const texture = new THREE.TextureLoader().load(modelPath)
+//     const material = new THREE.MeshBasicMaterial({ map: texture })
+//     const mesh = new THREE.Mesh(geometry, material)
+
+//     return mesh
+//     // const loader = new THREE.TextureLoader()
+//     // const texture = await loader.loadAsync(modelPath)
+//     // console.log("loaded sky")
+
+//     // const cubeMap = new THREE.WebGLCubeRenderTarget(texture.image.height).fromEquirectangularTexture(world.renderer, texture)
+//     // return cubeMap
+
+// }
+
 export const loadSky = async (modelPath) => {
-    const geometry = new THREE.SphereGeometry( 500, 60, 40 )
-	geometry.scale( - 1, 1, 1 )
+    const textureLoader = new THREE.TextureLoader()
+    const texture = await textureLoader.loadAsync(modelPath)
+    
+    console.log("loaded sky")
 
-    const texture = new THREE.TextureLoader().load(modelPath)
-    const material = new THREE.MeshBasicMaterial({ map: texture })
-    const mesh = new THREE.Mesh(geometry, material)
+    // , function (texture){
+    //      var material = new THREE.MeshBasicMaterial();
+    //      material.envMap = texture;
+})
 
-    return mesh
-    // const loader = new THREE.TextureLoader()
-    // const texture = await loader.loadAsync(modelPath)
-    // console.log("loaded sky")
+    // const path = 'textures/cube/SwedishRoyalCastle/';
+	// 			const format = '.jpg';
+	// 			const urls = [
+	// 				path + 'px' + format, path + 'nx' + format,
+	// 				path + 'py' + format, path + 'ny' + format,
+	// 				path + 'pz' + format, path + 'nz' + format
+	// 			];
 
-    // const cubeMap = new THREE.WebGLCubeRenderTarget(texture.image.height).fromEquirectangularTexture(world.renderer, texture)
-    // return cubeMap
+	// 			const reflectionCube = new THREE.CubeTextureLoader().load( urls );
+	// 			const refractionCube = new THREE.CubeTextureLoader().load( urls );
+	// 			refractionCube.mapping = THREE.CubeRefractionMapping;
 
 }
 

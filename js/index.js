@@ -1,5 +1,5 @@
-import { FACE_API_MODEL_PATH, RIG_MODEL_PATH, SKY_MODEL_PATH, RESOLUTION, X_ROTATIONAL_SCALE, STATUS_ICONS } from "./constants.js"
-import World, { createAmbientLight, createDirectionalLight, loadSky, loadModel } from "./world.js"
+import { FACE_API_MODEL_PATH, RIG_MODEL_PATH, RESOLUTION, X_ROTATIONAL_SCALE, STATUS_ICONS } from "./constants.js"
+import World, { createAmbientLight, createDirectionalLight, loadModel } from "./world.js"
 import { applyAttributes, allowNegativeIndex, formatPoints, distance, map } from "./utils.js"
 
 const world = new World()
@@ -20,7 +20,7 @@ const loadFaceAPI = (modelPath) => {
     console.log("loaded face api")
 }
 
-const startFaceAPI = (faceObject, skyObject) => {
+const startFaceAPI = (faceObject) => {
     const video = document.querySelector("video")
     applyAttributes(video, {
         width: 180,
@@ -44,7 +44,7 @@ const startFaceAPI = (faceObject, skyObject) => {
                 displayStatus(resized)
             }
 
-            skyObject.rotation.y += 0.001
+            // skyObject.rotation.y += 0.001
             world.update()
 
             return requestAnimationFrame(render)
@@ -130,10 +130,10 @@ const initialize = async () => {
     const model = await loadModel(RIG_MODEL_PATH)
     world.add(model)
 
-    const sky = await loadSky(SKY_MODEL_PATH)
-    world.add(sky)
+    // const sky = await loadSky(SKY_MODEL_PATH)
+    // world.add(sky)
 
-    startFaceAPI(model, sky)
+    startFaceAPI(model)
 }
 
 initialize()
