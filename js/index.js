@@ -31,7 +31,8 @@ const startFaceAPI = (object) => {
                 scoreThreshold: 0.45
             })).withFaceLandmarks().withFaceExpressions()
 
-            positionObject(object, detections[0])
+            const resized = faceapi.resizeResults(detections, RESOLUTION)
+            positionObject(object, resized[0])
             world.update()
 
             return requestAnimationFrame(render)
@@ -92,7 +93,7 @@ const positionObject = (object, results) => {
     const noseLength = nose[6][1] - nose[3][1]
     const rotationalX = Math.radians(Math.degrees((-Math.atan2(noseLength / eyeDistance, 0.05) + Math.radians(66))) * X_ROTATIONAL_SCALE) + Math.abs(rotationalY) 
     
-    object.rotation.set(rotationalX - 1, rotationalY, rotationalZ)
+    object.rotation.set(rotationalX - 1.5, rotationalY, rotationalZ)
 
     const newLocation = changePosition(box, map(noseLength + eyeDistance, [80, 350], [0, 5]))
     object.position.set(...newLocation)

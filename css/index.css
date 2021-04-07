@@ -5,12 +5,11 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background: #fff;
+    background-color: #f7d8Ba;
 }
 
 canvas {
     position: absolute;
-    background: #fff;
 }
 
 video {

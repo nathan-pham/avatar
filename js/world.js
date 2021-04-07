@@ -1,6 +1,6 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.127.0/build/three.module.js"
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.127.0/examples/jsm/loaders/GLTFLoader.js"
-import { ROOT, RESOLUTION } from "./constants.js"
+import { ROOT, RESOLUTION, ENVIRONMENT_COLOR } from "./constants.js"
 
 class World {
     scene = new THREE.Scene()
@@ -8,9 +8,9 @@ class World {
     renderer = new THREE.WebGLRenderer()
     
     constructor() {
-        this.scene.background = new THREE.Color(0xadd8e6)
+        this.scene.background = new THREE.Color(ENVIRONMENT_COLOR)
         this.renderer.setSize(RESOLUTION.width, RESOLUTION.height)
-        this.camera.position.z = 5
+        this.camera.position.z = 7
 
         ROOT.appendChild(this.renderer.domElement)
     }
@@ -24,9 +24,9 @@ class World {
     }
 }
 
-export const createAmbientLight = () => new THREE.AmbientLight(0xadd8e6, 100)
+export const createAmbientLight = () => new THREE.AmbientLight(0xffffff, 100)
 export const createDirectionalLight = (intensity, position) => {
-    const directionalLight = new THREE.DirectionalLight(0xffffff, intensity)
+    const directionalLight = new THREE.DirectionalLight(ENVIRONMENT_COLOR, intensity)
     directionalLight.position.set(...position)
     directionalLight.castShadow = false
     return directionalLight
