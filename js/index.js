@@ -105,10 +105,6 @@ const initialize = async () => {
     const model = await loadModel(RIG_MODEL_PATH)
     world.add(model)
     startFaceAPI(model)
-
-    // const box = new THREE.Box3().setFromObject(model)
-
-    // world.camera.target.position.copy(model.position)
 }
 
 initialize()
