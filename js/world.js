@@ -87,7 +87,7 @@ export const loadSky = async (modelPath) => {
     // , function (texture){
     //      var material = new THREE.MeshBasicMaterial();
     //      material.envMap = texture;
-})
+}
 
     // const path = 'textures/cube/SwedishRoyalCastle/';
 	// 			const format = '.jpg';
