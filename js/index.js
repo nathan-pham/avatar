@@ -1,66 +1,56 @@
-import * as Three from "https://cdnjs.cloudflare.com/ajax/libs/three.js/r127/three.module.min.js"
+import { ROOT, FACE_API_MODEL_PATH, RIG_MODEL_PATH, RESOLUTION, X_ROTATIONAL_SCALE } from "./constants.js"
+import { applyAttributes, allowNegativeIndex, distance, map } from "./utils.js"
+import World, { createAmbientLight, createDirectionalLight, loadModel } from "./world.js"
 
-const applyAttributes = (element, options) => (
-    Object.keys(resolution).forEach(prop => element.setAttribute(prop, options[prop]))
-)
+const world = new World()
+world.add(createAmbientLight())
+world.add(createDirectionalLight())
 
-const initializeVideo = () => {
-    const video = root.querySelector("video")
-    applyAttributes(video, resolution)
 
-    navigator.getUserMedia(
-        { video: {} },
-        stream => video.srcObject = stream,
-        err => console.error(err)
-    )
+const loadFaceAPI = (modelPath) => {
+    Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri(modelPath),
+        faceapi.nets.faceLandmark68Net.loadFromUri(modelPath),
+        faceapi.nets.faceExpressionNet.loadFromUri(modelPath),
+        faceapi.nets.faceRecognitionNet.loadFromUri(modelPath),
+    ])
+
+    console.log("loaded face api")
+}
+
+const startFaceAPI = (object) => {
+    const video = ROOT.querySelector("video")
+    applyAttributes(video, RESOLUTION)
+
+    navigator.getUserMedia({ video: {} }, stream => video.srcObject = stream, console.error)
 
     video.addEventListener("play", () => {
-        // const canvas = faceapi.createCanvasFromMedia(video)
-        // const context = canvas.getContext("2d")
-        // root.appendChild(canvas)
-        
-        // applyAttributes(canvas, resolution)
-        
         window.animation = (async function render() {
             const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
                 inputSize: 160,
                 scoreThreshold: 0.45
             })).withFaceLandmarks().withFaceExpressions()
 
-            // const results = faceapi.resizeResults(detections, resolution)
-            
-            // context.clearRect(0, 0, canvas.width, canvas.height)
-            // faceapi.draw.drawFaceLandmarks(canvas, resized)
-            // faceapi.draw.drawDetections(canvas, resized)
-            // faceapi.draw.drawFaceExpressions(canvas, resized)
-
-            if(renderer) {
-                updateCube(detections[0])
-                renderer.render(scene, camera)
-            }
+            positionObject(object, detections[0])
+            world.update()
 
             return requestAnimationFrame(render)
         })()
     })
-
-    return video
 }
 
 const changePosition = (box) => {
     const xPos = (box.left + box.width / 2)
-    const xPercent = xPos / resolution.width
+    const xPercent = xPos / RESOLUTION.width
     
     const yPos = (box.top + box.height / 2)
-    const yPercent = yPos / resolution.height
+    const yPercent = yPos / RESOLUTION.height
 
     return {
-        x: (xPercent - 0.5) * 10, 
+        x: (xPercent - 0.5) * -10, 
         y: (yPercent - 0.5) * -10
     }
 }
-
-const distance = (x1, y1, x2, y2) => Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
-const map = (input, [in_min, in_max], [out_min, out_max]) => (input - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 const formatPoints = (data) => {
     const points = []
@@ -70,20 +60,7 @@ const formatPoints = (data) => {
     return points
 }
 
-const allowNegativeIndex = (arr) => new Proxy(arr, {
-    get(target, prop) {
-        if (!isNaN(prop)) {
-            prop = parseInt(prop, 10)
-            if (prop < 0) {
-                prop += target.length
-            }
-        }
-
-        return target[prop]
-    }
-})
-
-const updateCube = (results) => {
+const positionObject = (object, results) => {
     const detection = results?.detection
 
     if(!detection) {
@@ -93,11 +70,8 @@ const updateCube = (results) => {
     const box = detection._box
     const points = formatPoints(results.landmarks._positions)
 
-
     const newLocation = changePosition(box)
-    Object.assign(cube.position, newLocation)
-
-    // console.log(changePosition(box))
+    Object.assign(object.position, newLocation)
 
     const chin = points.slice(0, 17)
     const lEyebrow = allowNegativeIndex(points.slice(17, 22))
@@ -119,23 +93,30 @@ const updateCube = (results) => {
     const rotationalX = Math.radians(Math.degrees((-Math.atan2(noseLength / eyeDistance, 0.05) + Math.radians(66))) * X_ROTATIONAL_SCALE) + Math.abs(rotationalY) 
     
 
-    Object.assign(cube.rotation, {
-        x: rotationalX,
+    Object.assign(object.rotation, {
+        x: rotationalX - 1,
         y: rotationalY,
         z: rotationalZ
     })
 
-    const scaleFactor = Math.abs(map(noseLength + eyeDistance, [90, 400], [1, 5]))
-    Object.assign(cube.scale, {
-        x: scaleFactor,
-        y: scaleFactor,
-        z: scaleFactor
-    })
+    // const scaleFactor = Math.abs(map(noseLength + eyeDistance, [90, 400], [1, 5]))
+    // Object.assign(object.scale, {
+    //     x: scaleFactor,
+    //     y: scaleFactor,
+    //     z: scaleFactor
+    // })
 }
 
-Promise.all([
-    faceapi.nets.tinyFaceDetector.loadFromUri(modelPath),
-    faceapi.nets.faceLandmark68Net.loadFromUri(modelPath),
-    faceapi.nets.faceExpressionNet.loadFromUri(modelPath),
-    faceapi.nets.faceRecognitionNet.loadFromUri(modelPath),
-]).then(initializeVideo)
+const initialize = async () => {
+    await loadFaceAPI(FACE_API_MODEL_PATH)
+
+    const model = await loadModel(RIG_MODEL_PATH)
+    world.add(model)
+    startFaceAPI(model)
+
+    // const box = new THREE.Box3().setFromObject(model)
+
+    // world.camera.target.position.copy(model.position)
+}
+
+initialize()

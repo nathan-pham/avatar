@@ -1,10 +1,5 @@
-const root = document.getElementById("root")
-const modelPath = "/js/face-api/models"
-const resolution = {
-    width: 640,
-    height: 360
-}
-const X_ROTATIONAL_SCALE = 3
-
-Math.radians = (degrees) => degrees * Math.PI / 180
-Math.degrees = (radians) => radians * 180 / Math.PI
+export const FACE_API_MODEL_PATH = "/js/face-api/models"
+export const RIG_MODEL_PATH = "/models/scene.gltf"
+export const ROOT = document.getElementById("root")
+export const RESOLUTION = { width: 640, height: 360 }
+export const X_ROTATIONAL_SCALE = 3
