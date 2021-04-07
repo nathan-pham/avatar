@@ -1,5 +1,6 @@
 export const FACE_API_MODEL_PATH = "/js/face-api/models"
 export const RIG_MODEL_PATH = "/models/scene.gltf"
+export const SKY_MODEL_PATH = "/models/sky.jpg"
 export const ROOT = document.getElementById("root")
 export const RESOLUTION = { width: window.innerWidth, height: window.innerHeight }
 export const X_ROTATIONAL_SCALE = 3

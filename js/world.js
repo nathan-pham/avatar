@@ -8,7 +8,7 @@ class World {
     renderer = new THREE.WebGLRenderer()
     
     constructor() {
-        this.scene.background = new THREE.Color(ENVIRONMENT_COLOR)
+        // this.scene.background = new THREE.Color(ENVIRONMENT_COLOR)
         this.renderer.setSize(RESOLUTION.width, RESOLUTION.height)
         this.camera.position.z = 7
 
@@ -21,6 +21,14 @@ class World {
 
     add(obj) {
         this.scene.add(obj)
+    }
+
+    resize() {
+        this.renderer.setSize(window.innerWidth, window.innerHeight, false)
+
+        const canvas = this.renderer.domElement
+        this.camera.aspect = canvas.clientWidth / canvas.clientHeight
+        this.camera.updateProjectionMatrix()
     }
 }
 
@@ -50,6 +58,24 @@ export const loadModel = (modelPath) => {
         console.log("loaded scene")
         return data.scene.children[0]
     })
+}
+
+export const loadSky = async (modelPath) => {
+    const geometry = new THREE.SphereGeometry( 500, 60, 40 )
+	geometry.scale( - 1, 1, 1 )
+
+    const texture = new THREE.TextureLoader().load(modelPath)
+    const material = new THREE.MeshBasicMaterial({ map: texture })
+    const mesh = new THREE.Mesh(geometry, material)
+
+    return mesh
+    // const loader = new THREE.TextureLoader()
+    // const texture = await loader.loadAsync(modelPath)
+    // console.log("loaded sky")
+
+    // const cubeMap = new THREE.WebGLCubeRenderTarget(texture.image.height).fromEquirectangularTexture(world.renderer, texture)
+    // return cubeMap
+
 }
 
 export default World

@@ -19,7 +19,6 @@ aside {
     z-index: 10;
     display: flex;
     align-items: center;
-    flex-direction: row-reverse;
 }
 
 aside video {
