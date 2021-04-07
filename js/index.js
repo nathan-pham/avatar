@@ -1,11 +1,11 @@
-import { ROOT, FACE_API_MODEL_PATH, RIG_MODEL_PATH, RESOLUTION, X_ROTATIONAL_SCALE, STATUS_ICONS } from "./constants.js"
+import { FACE_API_MODEL_PATH, RIG_MODEL_PATH, RESOLUTION, X_ROTATIONAL_SCALE, STATUS_ICONS } from "./constants.js"
 import World, { createAmbientLight, createDirectionalLight, createPointLight, loadModel } from "./world.js"
 import { applyAttributes, allowNegativeIndex, formatPoints, distance, map } from "./utils.js"
 
 const world = new World()
 world.add(createAmbientLight())
-world.add(createDirectionalLight(5, [1, -15, 0]))
-world.add(createPointLight(10, [0, 300, 500]))
+world.add(createDirectionalLight(5, [0, -15, 0]))
+// world.add(createPointLight(10, [0, -15, 0]))
 
 const loadFaceAPI = (modelPath) => {
     Promise.all([
@@ -19,16 +19,19 @@ const loadFaceAPI = (modelPath) => {
 }
 
 const startFaceAPI = (faceObject) => {
-    const video = ROOT.querySelector("video")
-    applyAttributes(video, RESOLUTION)
+    const video = document.querySelector("video")
+    applyAttributes(video, {
+        width: 180,
+        height: 112
+    })
 
     navigator.getUserMedia({ video: {} }, stream => video.srcObject = stream, console.error)
 
     video.addEventListener("play", () => {
         window.animation = (async function render() {
             const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({
-                inputSize: 160,
-                scoreThreshold: 0.45
+                inputSize: 128
+                // scoreThreshold: 0.2
             })).withFaceLandmarks().withFaceExpressions()
 
             const resized = faceapi.resizeResults(detections, RESOLUTION)[0]
@@ -52,7 +55,7 @@ const changePosition = (box, z=0) => {
     const yPercent = yPos / RESOLUTION.height
 
     return [
-        (xPercent - 0.5) * -10, 
+        (xPercent - 0.5) * 10, 
         (yPercent - 0.5) * -10,
         z
     ]
@@ -79,10 +82,6 @@ const displayStatus = (results) => {
     }
 
     span.textContent = STATUS_ICONS[status]
-    // Object.assign(span.style, {
-    //     top: box.top + "px",
-    //     left: box.left + "px"
-    // })
 }
 
 const positionObject = (object, results) => {
