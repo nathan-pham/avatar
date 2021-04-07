@@ -88,10 +88,10 @@ const positionObject = (object, results) => {
     const lEyebrowLength = distance(lEyebrow[-1][0], lEyebrow[-1][1], lEyebrow[0][0], lEyebrow[0][1]) / eyeDistance
     const rEyebrowLength = distance(rEyebrow[-1][0], rEyebrow[-1][1], rEyebrow[0][0], rEyebrow[0][1]) / eyeDistance
     const eyebrowImplications = lEyebrowLength - rEyebrowLength
-    const rotationalY = Math.radians(eyebrowImplications * 90) * 0.85
+    const rotationalY = Math.radians(eyebrowImplications * 90)
 
     const noseLength = nose[6][1] - nose[3][1]
-    const rotationalX = Math.radians(Math.degrees((-Math.atan2(noseLength / eyeDistance, 0.05) + Math.radians(66))) * X_ROTATIONAL_SCALE) + Math.abs(rotationalY) 
+    const rotationalX = Math.radians(Math.degrees((-Math.atan2(noseLength / eyeDistance, 0.05) + Math.radians(66))) * X_ROTATIONAL_SCALE) + Math.abs(rotationalY)
     
     object.rotation.set(rotationalX - 1.5, rotationalY, rotationalZ)
 
