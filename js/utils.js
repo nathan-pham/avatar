@@ -20,6 +20,14 @@ export const allowNegativeIndex = (arr) => new Proxy(arr, {
     }
 })
 
+export const formatPoints = (data) => {
+    const points = []
+    for(const [key, value] of Object.entries(data)) {
+        points.push([value._x, value._y])
+    }
+    return points
+}
+
 export const distance = (x1, y1, x2, y2) => Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
 
 export const map = (input, [in_min, in_max], [out_min, out_max]) => (input - in_min) * (out_max - out_min) / (in_max - in_min) + out_min

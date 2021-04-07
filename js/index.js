@@ -1,6 +1,6 @@
-import { ROOT, FACE_API_MODEL_PATH, RIG_MODEL_PATH, RESOLUTION, X_ROTATIONAL_SCALE } from "./constants.js"
-import { applyAttributes, allowNegativeIndex, distance, map } from "./utils.js"
+import { ROOT, FACE_API_MODEL_PATH, RIG_MODEL_PATH, RESOLUTION, X_ROTATIONAL_SCALE, STATUS_ICONS } from "./constants.js"
 import World, { createAmbientLight, createDirectionalLight, createPointLight, loadModel } from "./world.js"
+import { applyAttributes, allowNegativeIndex, formatPoints, distance, map } from "./utils.js"
 
 const world = new World()
 world.add(createAmbientLight())
@@ -18,7 +18,7 @@ const loadFaceAPI = (modelPath) => {
     console.log("loaded face api")
 }
 
-const startFaceAPI = (object) => {
+const startFaceAPI = (faceObject) => {
     const video = ROOT.querySelector("video")
     applyAttributes(video, RESOLUTION)
 
@@ -31,9 +31,13 @@ const startFaceAPI = (object) => {
                 scoreThreshold: 0.45
             })).withFaceLandmarks().withFaceExpressions()
 
-            const resized = faceapi.resizeResults(detections, RESOLUTION)
-            positionObject(object, resized[0])
-            world.update()
+            const resized = faceapi.resizeResults(detections, RESOLUTION)[0]
+
+            if(resized) {
+                positionObject(faceObject, resized)
+                displayStatus(resized)
+                world.update()
+            }
 
             return requestAnimationFrame(render)
         })()
@@ -54,12 +58,31 @@ const changePosition = (box, z=0) => {
     ]
 }
 
-const formatPoints = (data) => {
-    const points = []
-    for(const [key, value] of Object.entries(data)) {
-        points.push([value._x, value._y])
+
+const displayStatus = (results) => {
+    const detection = results?.detection
+
+    if(!detection) {
+        return
     }
-    return points
+
+    const box = detection._box
+    const span = document.querySelector("span")
+
+    let min = 0
+    let status = "default"
+    for(const [key, value] of Object.entries(results.expressions || {})) {
+        if(value > min) {
+            min = value
+            status = key
+        }
+    }
+
+    span.textContent = STATUS_ICONS[status]
+    // Object.assign(span.style, {
+    //     top: box.top + "px",
+    //     left: box.left + "px"
+    // })
 }
 
 const positionObject = (object, results) => {
@@ -71,8 +94,6 @@ const positionObject = (object, results) => {
 
     const box = detection._box
     const points = formatPoints(results.landmarks._positions)
-
-    // Object.assign(object.position, newLocation)
 
     const lEyebrow = allowNegativeIndex(points.slice(17, 22))
     const rEyebrow = allowNegativeIndex(points.slice(22, 27))
@@ -93,7 +114,7 @@ const positionObject = (object, results) => {
     const noseLength = nose[6][1] - nose[3][1]
     const rotationalX = Math.radians(Math.degrees((-Math.atan2(noseLength / eyeDistance, 0.05) + Math.radians(66))) * X_ROTATIONAL_SCALE) + Math.abs(rotationalY)
     
-    object.rotation.set(rotationalX - 1.5, rotationalY, rotationalZ)
+    object.rotation.set(rotationalX - 1, rotationalY, rotationalZ)
 
     const newLocation = changePosition(box, map(noseLength + eyeDistance, [80, 350], [0, 5]))
     object.position.set(...newLocation)

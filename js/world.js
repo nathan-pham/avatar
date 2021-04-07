@@ -38,7 +38,6 @@ export const createPointLight = (intensity, position) => {
     return directionalLight
 }
 
-
 export const createCube = () => {
     const geometry = new THREE.BoxGeometry(1, 1, 1)
     const material = new THREE.MeshNormalMaterial({})
