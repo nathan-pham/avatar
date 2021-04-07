@@ -91,8 +91,11 @@ const updateCube = (results) => {
     const box = detection._box
     const points = formatPoints(results.landmarks._positions)
 
-    Object.assign(cube.position, changePosition(box))
 
+    const newLocation = changePosition(box)
+    Object.assign(cube.position, newLocation)
+
+    // console.log(changePosition(box))
 
     const chin = points.slice(0, 17)
     const lEyebrow = allowNegativeIndex(points.slice(17, 22))
@@ -113,13 +116,14 @@ const updateCube = (results) => {
     const noseLength = nose[6][1] - nose[3][1]
     const rotationalX = Math.radians(Math.degrees((-Math.atan2(noseLength / eyeDistance, 0.05) + Math.radians(66))) * X_ROTATIONAL_SCALE) + Math.abs(rotationalY) 
     
+
     Object.assign(cube.rotation, {
         x: rotationalX,
         y: rotationalY,
         z: rotationalZ
     })
 
-    const scaleFactor = map(noseLength, [10, 60], [1, 5])
+    const scaleFactor = Math.abs(map(noseLength + eyeDistance, [90, 400], [1, 5]))
     Object.assign(cube.scale, {
         x: scaleFactor,
         y: scaleFactor,
